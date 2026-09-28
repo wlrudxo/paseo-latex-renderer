@@ -27,6 +27,14 @@ css = css.replace(/url\((fonts\/([^\)]+\.woff2))\)/g, (match, fontPath) => {
 css = css.replace(/,url\([^\)]+\.woff\) format\(["'']woff["'']\)/g, "");
 css = css.replace(/,url\([^\)]+\.ttf\) format\(["'']truetype["'']\)/g, "");
 
+// Host app font rules can override KaTeX's font-family declarations, so mark
+// them !important everywhere except inside @font-face descriptors.
+css = css.replace(/(@font-face\{[^}]*\})|font-family:([^;}]+)/g, (match, fontFace, family) =>
+  fontFace ? fontFace : `font-family:${family}!important`,
+);
+css += "\n.katex{font-family:KaTeX_Main,Times New Roman,serif!important}";
+css += "\n.katex *{font-family:inherit!important}";
+
 // Add custom plugin styles for desktop rendering, scrolling, and theme adaptation
 const customCss = `
 .katex {
